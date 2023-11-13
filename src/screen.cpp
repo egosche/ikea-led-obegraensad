@@ -120,18 +120,18 @@ void IRAM_ATTR Screen_::onScreenTimer()
 void Screen_::setup()
 {
   // TODO find proper unused pins for MISO and SS
-  
-  #ifdef ESP8266
+
+#ifdef ESP8266
   SPI.pins(PIN_CLOCK, 12, PIN_DATA, 15); // SCLK, MISO, MOSI, SS);
   SPI.begin();
   SPI.beginTransaction(SPISettings(10000000, MSBFIRST, SPI_MODE0));
-  
+
   timer1_attachInterrupt(&onScreenTimer);
-  timer1_enable(TIM_DIV256, TIM_EDGE, TIM_SINGLE); 
+  timer1_enable(TIM_DIV256, TIM_EDGE, TIM_SINGLE);
   timer1_write(100);
-  #endif
-  
-  #ifdef ESP32
+#endif
+
+#ifdef ESP32
   SPI.begin(PIN_CLOCK, 34, PIN_DATA, 25); // SCLK, MISO, MOSI, SS
   SPI.beginTransaction(SPISettings(10000000, MSBFIRST, SPI_MODE0));
 
@@ -139,17 +139,17 @@ void Screen_::setup()
   timerAttachInterrupt(Screen_timer, &onScreenTimer, true);
   timerAlarmWrite(Screen_timer, TIMER_INTERVAL_US, true);
   timerAlarmEnable(Screen_timer);
-  #endif
+#endif
 }
 
 void ICACHE_RAM_ATTR Screen_::_render()
 {
   const auto buf = this->getRotatedRenderBuffer();
 
-  static byte bits[ROWS * COLS / 8] = {0};
+  static unsigned char bits[ROWS * COLS / 8] = {0};
   memset(bits, 0, ROWS * COLS / 8);
 
-  static byte counter = 0;
+  static unsigned char counter = 0;
 
   for (int idx = 0; idx < ROWS * COLS; idx++)
   {
@@ -268,11 +268,11 @@ uint8_t Screen_::getCurrentBrightness() const
 void Screen_::setBrightness(uint8_t brightness)
 {
   this->brightness = brightness;
-  
-  #ifndef ESP8266
-  // analogWrite disable the timer1 interrupt on esp8266 
+
+#ifndef ESP8266
+  // analogWrite disable the timer1 interrupt on esp8266
   analogWrite(PIN_ENABLE, 255 - brightness);
-  #endif
+#endif
 }
 
 void Screen_::drawBigNumbers(int x, int y, std::vector<int> numbers, uint8_t brightness)

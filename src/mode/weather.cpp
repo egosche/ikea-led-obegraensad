@@ -8,7 +8,6 @@ unsigned long lastUpdate = 0;
 HTTPClient http;
 WiFiClient wifiClient;
 
-
 // https://github.com/chubin/wttr.in/blob/master/share/translations/en.txt
 std::vector<int> thunderCodes = {200, 386, 389, 392, 395};
 std::vector<int> cloudyCodes = {119, 122};
@@ -37,9 +36,9 @@ void weatherLoop()
     {
         weatherUpdate();
         lastUpdate = millis();
-        #ifndef ARDUINO_ESP8266_ESP01
+#ifndef ARDUINO_ESP8266_ESP01
         Serial.println("updating weather");
-        #endif
+#endif
     };
 }
 
@@ -47,9 +46,10 @@ void weatherUpdate()
 {
     String weatherApiString = "https://wttr.in/" + String(WEATHER_LOCATION) + "?format=j2&lang=en";
     http.begin(wifiClient, weatherApiString);
-    http.GET();
+    int code = http.GET();
 
-    if (code == HTTP_CODE_OK) {
+    if (code == HTTP_CODE_OK)
+    {
         DynamicJsonDocument doc(2048);
         deserializeJson(doc, http.getString());
 
@@ -120,6 +120,5 @@ void weatherUpdate()
             Screen.drawNumbers(3, tempY, {temperature});
         }
     }
-
 }
 #endif
